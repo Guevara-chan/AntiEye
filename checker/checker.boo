@@ -57,8 +57,9 @@ class DirReport():
 class Checker():
 	log		= {info, channel|info = ':I Am Dummy:'; return self}
 	dbg		= {info|info = ':I am Error:'; return self}
-	tasks	= Collections.Generic.Dictionary[of String, bool]()
-	final tension_limit = 15
+	tasks	= Collections.Generic.Dictionary[of WebBrowser, DateTime]()
+	final tension_limit = 16
+	final timeout		= 30
 	reporter as Type
 
 	# --Methods goes here.
@@ -78,12 +79,12 @@ class Checker():
 		user, password = url.UserInfo.Split(char(':'))
 		frame.Navigate("$(url)snapshot.cgi?user=$(user)&pwd=$(password)")
 		frame.DocumentCompleted += checker(url, dest)
-		log("Launching check for $url", 'launch').tasks.Add(url.ToString(), true)
+		log("Launching check for $url", 'launch').tasks.Add(frame, DateTime.Now)
 		return self
 
 	def checker(url as Uri, dest as duck):
 		return def(sender as WebBrowser, e):
-			return unless tasks.Remove("$url")
+			return unless tasks.Remove(sender)
 			# Error checkup.
 			# TO BE DONE !
 			# Down checkup.
@@ -93,9 +94,6 @@ class Checker():
 			# Screenshot init.
 			using bmp = Bitmap(sender.Width - 20, sender.Height):
 				sender.DrawToBitmap(bmp, Rectangle(0, 0, bmp.Width, bmp.Height))
-				#try: bmp = bmp.Clone(Rectangle(10, 15, bmp.Width - 30, bmp.Height - 10), bmp.PixelFormat)
-				#except ex: print ex
-
 				using out = Graphics.FromImage(bmp):
 					login = url.UnescapeDataString(url.UserInfo)
 					rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
@@ -109,7 +107,9 @@ class Checker():
 			dest.echo(url, 'success')
 
 	def wait(max_tension as int):
-		while tension > max_tension: Application.DoEvents()
+		for entry in Collections.Generic.Dictionary[of WebBrowser, DateTime](tasks):
+			entry.Key.Stop() if (DateTime.Now - entry.Value).TotalSeconds > timeout
+		while tension >= max_tension: Application.DoEvents()
 		return self
 
 	[Extension] static def echo(out as StreamWriter, text as string):
@@ -126,9 +126,9 @@ class Checker():
 				dest = reporter(value)
 				log("\nParsing '$value'...", 'io')
 				for entry in File.ReadLines(value):
-					if (url = parse(entry)): check(url, dest).dbg(" [$tension/$(tension_limit+1)]").wait(tension_limit)
+					if (url = parse(entry)): check(url, dest).dbg(" [$tension/$tension_limit)]").wait(tension_limit)
 					else: log("Invalid entry encountered: $entry", 'fault')
-				wait(0)
+				wait(1)
 			except ex: log("$ex", 'fault')
 #.}
 
