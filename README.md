@@ -13,3 +13,6 @@ __Design:__ terminal-based utility, written entirelly in [Boo v0.9.7.0](https://
 __Usage:__ mass-checking remote webcams through provided credentials feed by requesting broadcast snapshots.  
 __Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.03/checker.zip (latest release)  
 __Extra:__ requires .NET 4.0 framework to run.
+
+# .:Brief samples of interfacing:
+![image](https://user-images.githubusercontent.com/8768470/42713688-019e4196-86f9-11e8-9e15-61090943f2e7.png)
