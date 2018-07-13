@@ -26,7 +26,6 @@ class UI
 							#{data.get 'username'}<span class='delim'>:</span>#{data.get 'password'}"
 					http = "http://#{encodeURIComponent data.get 'username'}:#{encodeURIComponent data.get 'password'
 							}@#{data.get 'ip'}:#{data.get 'port'}"
-					console.log http
 					setTimeout ((info, http) =>
 						@out.innerHTML = "<div class='info'>⟲ .:Loading entry \##{listing.size}:. ⟳</div>"
 						listing.add "<div class='liner'><a href='#{http}' target='_blank'>#{info}</a></div>"
