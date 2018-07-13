@@ -1,2 +1,2 @@
 # AntiEye
-/IP webcam penetration test suit/
+Access parser through: https://guevara-chan.github.io/AntiEye/parser/main.html
