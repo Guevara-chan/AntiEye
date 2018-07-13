@@ -11,5 +11,5 @@ __Extra:__ requires ES6 support to work properly.
 # :.Checker.:
 Terminal-based utility, written in Boo v0.9.7.0 with auxiliary libraries from [Emgu CV](www.emgu.com) project.
 Access latest version archive through: https://github.com/Guevara-chan/AntiEye/releases/download/v0.02/checker.zip
-Designed to mass-check remote webcams through provided credentials list, taking screenshots in process.
+Designed to mass-check remote webcams through provided credentials list, taking screenshots in process.  
 __Extra:__ requires .NET 4.0 and x64 Windows system to run.
