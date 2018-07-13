@@ -15,4 +15,5 @@ __Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.03/checke
 __Extra:__ requires .NET 4.0 framework to run.
 
 # .:Brief samples of interfacing:.
-![image](https://user-images.githubusercontent.com/8768470/42713688-019e4196-86f9-11e8-9e15-61090943f2e7.png)
+![image](https://user-images.githubusercontent.com/8768470/42713786-59e2e636-86f9-11e8-8e1b-63dcb8db68e9.png)
+
