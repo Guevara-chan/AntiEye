@@ -9,7 +9,7 @@ __Dist:__ https://guevara-chan.github.io/AntiEye/parser/main.html (live version)
 __Extra:__ requires ES6 support to work properly.
 
 # :.Checker.:
-__Design:__ terminal-based utility, written in [Boo v0.9.7.0](https://github.com/boo-lang/boo) with auxiliary libraries from [Emgu CV](www.emgu.com) project.  
-__Usage:__ mass-checking remote webcams through provided credentials list by taking videofeed or interface screenshots.  
-__Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.02/checker.zip (latest release)  
-__Extra:__ requires .NET 4.0 and x64 Windows system to run.
+__Design:__ terminal-based utility, written entirelly in [Boo v0.9.7.0](https://github.com/boo-lang/boo).  
+__Usage:__ mass-checking remote webcams through provided credentials feed by requesting broadcasted snapshots.  
+__Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.03/checker.zip (latest release)  
+__Extra:__ requires .NET 4.0 framework to run.
