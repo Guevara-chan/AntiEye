@@ -1,11 +1,13 @@
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# AntiEye webcam checker v0.03
+# AntiEye webcam checker v0.04
 # Developed in 2018 by Guevara-chan.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 import System
 import System.IO
+import System.Net
 import System.Drawing
+import System.Reflection
 import System.Windows.Forms
 import System.Text.RegularExpressions
 import System.Runtime.CompilerServices
@@ -18,7 +20,7 @@ class CUI():
 	def constructor():
 		dbg("")
 		log("""# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-			# AntiEye webcam checker v0.03      #
+			# AntiEye webcam checker v0.04      #
 			# Developed in 2018 by V.A. Guevara #
 			# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #""".Replace('\t', ''), "meta")
 
@@ -57,7 +59,7 @@ class DirReport():
 class Checker():
 	log		= {info, channel|info = ':I Am Dummy:'; return self}
 	dbg		= {info|info = ':I am Error:'; return self}
-	tasks	= Collections.Generic.Dictionary[of WebBrowser, DateTime]()
+	tasks	= Collections.Generic.Dictionary[of WebClient, DateTime]()
 	final tension_limit = 16
 	final timeout		= 30
 	reporter as Type
@@ -67,6 +69,7 @@ class Checker():
 		log			= {info, channel|ui.log(info, channel); return self}
 		dbg			= {info|ui.dbg(info); return self}
 		reporter	= storage
+		safetylast() unless Configuration.HttpWebRequestElement().UseUnsafeHeaderParsing
 
 	def parse(entry as string):
 		entry = Regex(" ").Replace(entry, '\n', 1)
@@ -75,42 +78,50 @@ class Checker():
 			return Uri("http://$(Uri.EscapeDataString(user)):$(Uri.EscapeDataString(pword))@$host:$port")
 
 	def check(url as Uri, dest as duck):
-		frame = WebBrowser(Width: 680, Height: 510, ScriptErrorsSuppressed: true)
 		user, password = url.UserInfo.Split(char(':'))
-		frame.Navigate("$(url)snapshot.cgi?user=$(user)&pwd=$(password)")
-		frame.DocumentCompleted += checker(url, dest)
-		log("Launching check for $url", 'launch').tasks.Add(frame, DateTime.Now)
+		req = Net.WebClient()
+		req.DownloadDataAsync(Uri("$(url)snapshot.cgi?user=$(user)&pwd=$(password)"))
+		req.DownloadDataCompleted += checker(url, dest)
+		log("Launching check for $url", 'launch').tasks.Add(req, DateTime.Now)
 		return self
 
 	def checker(url as Uri, dest as duck):
-		return def(sender as WebBrowser, e):
+		return def(sender as WebClient, e as DownloadDataCompletedEventArgs):
 			return unless tasks.Remove(sender)
 			# Error checkup.
-			# TO BE DONE !
-			# Down checkup.
-			if 'res://ieframe.dll/ErrorPageTemplate.css' in sender.DocumentText:
+			try:
+				bmp = Bitmap(MemoryStream(e.Result)) unless e.Cancelled or e.Error
+			except: pass
+			unless bmp:
 				dest.echo(url, 'fail')
 				return log("Unable to load $url", 'fail')
 			# Screenshot init.
-			using bmp = Bitmap(sender.Width - 20, sender.Height):
-				sender.DrawToBitmap(bmp, Rectangle(0, 0, bmp.Width, bmp.Height))
-				using out = Graphics.FromImage(bmp):
-					login = url.UnescapeDataString(url.UserInfo)
-					rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
-					rect.Width += 2
-					out.FillRectangle(SolidBrush(Color.Black), rect)
-					out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
-					out.DrawString(login, font, SolidBrush(forecolor), start)
-				shot = dest.store(bmp, "$(url.Host)[$(url.Port)].png")
+			using out = Graphics.FromImage(bmp):
+				login = url.UnescapeDataString(url.UserInfo)
+				rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
+				rect.Width += 2
+				out.FillRectangle(SolidBrush(Color.Black), rect)
+				out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
+				out.DrawString(login, font, SolidBrush(forecolor), start)
+			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].png")
 			# Finalization.
 			log("$shot was taken from $url", 'success')
 			dest.echo(url, 'success')
 
 	def wait(max_tension as int):
-		for entry in Collections.Generic.Dictionary[of WebBrowser, DateTime](tasks):
-			entry.Key.Stop() if (DateTime.Now - entry.Value).TotalSeconds > timeout
+		for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
+			entry.Key.CancelAsync () if (DateTime.Now - entry.Value).TotalSeconds > timeout
 		while tension >= max_tension: Application.DoEvents()
 		return self
+
+	static def safetylast():
+		settingsSectionType  = Assembly.GetAssembly(typeof(Net.Configuration.SettingsSection))\
+		.GetType("System.Net.Configuration.SettingsSectionInternal")
+		anInstance = settingsSectionType.InvokeMember("Section", BindingFlags.Static
+		 | BindingFlags.GetProperty | BindingFlags.NonPublic, null, null, (,));
+		aUseUnsafeHeaderParsing = settingsSectionType.GetField("useUnsafeHeaderParsing", BindingFlags.NonPublic
+		 | BindingFlags.Instance)
+		aUseUnsafeHeaderParsing.SetValue(anInstance, true)
 
 	[Extension] static def echo(out as StreamWriter, text as string):
 		out.WriteLine(text)
