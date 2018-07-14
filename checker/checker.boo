@@ -62,6 +62,8 @@ class Checker():
 	tasks	= Collections.Generic.Dictionary[of WebClient, DateTime]()
 	final tension_limit = 16
 	final timeout		= 30
+	final reductor		= Timer(Enabled: true, Interval: 1000, Tick: reduce)
+	final debugger		= Timer(Enabled: true, Interval: 100, Tick: {dbg(" [$tension/$tension_limit)]")})
 	reporter as Type
 
 	# --Methods goes here.
@@ -109,9 +111,12 @@ class Checker():
 			dest.echo(url, 'success')
 
 	def wait(max_tension as int):
-		for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
-			entry.Key.CancelAsync () if (DateTime.Now - entry.Value).TotalSeconds > timeout
 		while tension >= max_tension: Application.DoEvents()
+		return self
+
+	def reduce():
+		for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
+			entry.Key.CancelAsync() if (DateTime.Now - entry.Value).TotalSeconds > timeout
 		return self
 
 	static def safetylast():
@@ -137,9 +142,10 @@ class Checker():
 				dest = reporter(value)
 				log("\nParsing '$value'...", 'io')
 				for entry in File.ReadLines(value):
-					if (url = parse(entry)): check(url, dest).dbg(" [$tension/$tension_limit)]").wait(tension_limit)
+					if (url = parse(entry)): check(url, dest).wait(tension_limit)
 					else: log("Invalid entry encountered: $entry", 'fault')
 				wait(1)
+
 			except ex: log("$ex", 'fault')
 #.}
 
