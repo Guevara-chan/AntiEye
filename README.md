@@ -11,7 +11,7 @@ __Extra:__ requires ES6 support to work properly.
 # .:Checker:.
 __Design:__ terminal-based utility, written entirelly in [Boo v0.9.7.0](https://github.com/boo-lang/boo).  
 __Usage:__ mass-checking remote webcams through provided credentials feed by requesting broadcast snapshots.  
-__Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.03/checker.zip (latest release)  
+__Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.04/checker.zip (latest release)  
 __Extra:__ requires .NET 4.0 framework to run.
 
 # .:Brief samples of interfacing:.
