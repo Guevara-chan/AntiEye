@@ -60,10 +60,10 @@ class Checker():
 	log		= {info, channel|info = ':I Am Dummy:'; return self}
 	dbg		= {info|info = ':I am Error:'; return self}
 	tasks	= Collections.Generic.Dictionary[of WebClient, DateTime]()
-	final tension_limit = 16
+	final max_tension	= 16
 	final timeout		= 30
 	final reductor		= Timer(Enabled: true, Interval: 1000, Tick: reduce)
-	final debugger		= Timer(Enabled: true, Interval: 100, Tick: {dbg(" [$tension/$tension_limit)]")})
+	final debugger		= Timer(Enabled: true, Interval: 200, Tick: {dbg(" [$tension/$max_tension)]")})
 	reporter as Type
 
 	# --Methods goes here.
@@ -110,10 +110,6 @@ class Checker():
 			log("$shot was taken from $url", 'success')
 			dest.echo(url, 'success')
 
-	def wait(max_tension as int):
-		while tension >= max_tension: Application.DoEvents()
-		return self
-
 	def reduce():
 		for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
 			entry.Key.CancelAsync() if (DateTime.Now - entry.Value).TotalSeconds > timeout
@@ -139,17 +135,19 @@ class Checker():
 	feed:
 		set:
 			try:
-				dest = reporter(value)
 				log("\nParsing '$value'...", 'io')
-				for entry in File.ReadLines(value):
-					if (url = parse(entry)): check(url, dest).wait(tension_limit)
-					else: log("Invalid entry encountered: $entry", 'fault')
-				wait(1)
-
+				feeder = File.ReadLines(value).GetEnumerator()
+				dest = reporter(value)
+				while true:
+					if tension < max_tension and feeder.MoveNext():
+						if (url = parse(feeder.Current)): check(url, dest)
+						else: log("Invalid entry encountered: $(feeder.Current)", 'fault')
+					elif tension == 0: break
+					Application.DoEvents()
 			except ex: log("$ex", 'fault')
 #.}
 
 # ==Main code==
-[STAThread] def Main(argv as (string)):	
+def Main(argv as (string)):	
 	Checker(CUI(), DirReport).feed = (argv[0] if argv.Length else 'feed.txt')
 	Threading.Thread.Sleep(3000)
