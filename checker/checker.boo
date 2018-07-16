@@ -58,14 +58,14 @@ class DirReport():
 		return "$dest/$fname"
 # -------------------- #
 class Checker():
-	log		= {info, channel|info = ':I Am Dummy:'; return self}
-	dbg		= {info|info = ':I am Error:'; return self}
-	tasks	= Collections.Generic.Dictionary[of WebClient, DateTime]()
+	final log			= {info, channel|info = ':I am Error:'; return self}
+	final dbg			= {info|info = ':I am Error:'; return self}
+	final tasks			= Collections.Generic.Dictionary[of WebClient, DateTime]()
 	final max_tension	= 16
 	final timeout		= 30
 	final reductor		= Timer(Enabled: true, Interval: 1000, Tick: reduce)
 	final debugger		= Timer(Enabled: true, Interval: 200, Tick: {dbg(" [$tension/$max_tension)]")})
-	reporter as Type
+	final reporter		= void
 
 	# --Methods goes here.
 	def constructor(ui as duck, storage as Type):
