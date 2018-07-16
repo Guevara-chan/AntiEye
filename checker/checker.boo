@@ -9,9 +9,9 @@ import System.Net
 import System.Drawing
 import System.Reflection
 import System.Windows.Forms
-import System.Configuration
 import System.Text.RegularExpressions
 import System.Runtime.CompilerServices
+import System.Configuration from System.Configuration
 
 #.{ [Classes]
 class CUI():
@@ -72,15 +72,7 @@ class Checker():
 		log			= {info, channel|ui.log(info, channel); return self}
 		dbg			= {info|ui.dbg(info); return self}
 		reporter	= storage
-		try: # F**ing Mono.
-			safetylast() unless Configuration.HttpWebRequestElement().UseUnsafeHeaderParsing
-		except: pass
-
-	def parse(entry as string):
-		entry = Regex(" ").Replace(entry, '\n', 1)
-		if Regex.Matches(entry, ":").Count == 2 and Regex.Matches(entry, "\n").Count == 1:
-			host, port, user, pword = entry.Split(char(':'), char('\n'))
-			return Uri("http://$(Uri.EscapeDataString(user)):$(Uri.EscapeDataString(pword))@$host:$port")
+		safety		= false if safety
 
 	def check(url as Uri, dest as duck):
 		user, password = url.UserInfo.Split(char(':'))
@@ -119,14 +111,11 @@ class Checker():
 				entry.Key.CancelAsync() if (DateTime.Now - entry.Value).TotalSeconds > timeout
 		return self
 
-	static def safetylast():
-		settingsSectionType  = Assembly.GetAssembly(typeof(Net.Configuration.SettingsSection))\
-		.GetType("System.Net.Configuration.SettingsSectionInternal")
-		anInstance = settingsSectionType.InvokeMember("Section", BindingFlags.Static
-	 	| BindingFlags.GetProperty | BindingFlags.NonPublic, null, null, (,));
-		aUseUnsafeHeaderParsing = settingsSectionType.GetField("useUnsafeHeaderParsing", BindingFlags.NonPublic
-	 	| BindingFlags.Instance)
-		aUseUnsafeHeaderParsing.SetValue(anInstance, true)
+	[Extension] static def parse(entry as string):
+		entry = Regex(" ").Replace(entry, '\n', 1)
+		if Regex.Matches(entry, ":").Count == 2 and Regex.Matches(entry, "\n").Count == 1:
+			host, port, user, pword = entry.Split(char(':'), char('\n'))
+			return Uri("http://$(Uri.EscapeDataString(user)):$(Uri.EscapeDataString(pword))@$host:$port")
 
 	[Extension] static def echo(out as StreamWriter, text as string):
 		out.WriteLine(text)
@@ -144,11 +133,25 @@ class Checker():
 				dest = reporter(value)
 				while true:
 					if tension < max_tension and feeder.MoveNext():
-						if (url = parse(feeder.Current)): check(url, dest)
+						if (url = feeder.Current.parse()): check(url, dest)
 						else: log("Invalid entry encountered: $(feeder.Current)", 'fault')
 					elif tension == 0: break
 					Application.DoEvents()
 			except ex: log("$ex", 'fault')
+
+	static safety:
+		set:
+			settingsSectionType  = Assembly.GetAssembly(typeof(Net.Configuration.SettingsSection))\
+			.GetType("System.Net.Configuration.SettingsSectionInternal")
+			anInstance = settingsSectionType.InvokeMember("Section", BindingFlags.Static
+	 		| BindingFlags.GetProperty | BindingFlags.NonPublic, null, null, (,));
+			aUseUnsafeHeaderParsing = settingsSectionType.GetField("useUnsafeHeaderParsing", BindingFlags.NonPublic
+	 		| BindingFlags.Instance)
+			aUseUnsafeHeaderParsing.SetValue(anInstance, not value)
+		get: 
+			sect as duck = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)\
+			.GetSection("system.net/settings")
+			return not sect.HttpWebRequest.UseUnsafeHeaderParsing
 #.}
 
 # ==Main code==
