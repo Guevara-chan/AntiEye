@@ -114,8 +114,9 @@ class Checker():
 			dest.echo(url, 'success')
 
 	def reduce():
-		for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
-			entry.Key.CancelAsync() if (DateTime.Now - entry.Value).TotalSeconds > timeout
+		lock tasks:
+			for entry in Collections.Generic.Dictionary[of WebClient, DateTime](tasks):
+				entry.Key.CancelAsync() if (DateTime.Now - entry.Value).TotalSeconds > timeout
 		return self
 
 	static def safetylast():
