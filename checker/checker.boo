@@ -79,7 +79,7 @@ class Checker():
 		req = Net.WebClient()
 		req.DownloadDataAsync(Uri("$(url)snapshot.cgi?user=$(user)&pwd=$(password)"))
 		req.DownloadDataCompleted += checker(url, dest)
-		lock (tasks): log("Launching check for $url", 'launch').tasks.Add(req, DateTime.Now)
+		lock tasks: log("Launching check for $url", 'launch').tasks.Add(req, DateTime.Now)
 		return self
 
 	def checker(url as Uri, dest as duck):
