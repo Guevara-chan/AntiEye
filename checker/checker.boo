@@ -79,12 +79,13 @@ class Checker():
 		req = Net.WebClient()
 		req.DownloadDataAsync(Uri("$(url)snapshot.cgi?user=$(user)&pwd=$(password)"))
 		req.DownloadDataCompleted += checker(url, dest)
-		log("Launching check for $url", 'launch').tasks.Add(req, DateTime.Now)
+		lock (tasks): log("Launching check for $url", 'launch').tasks.Add(req, DateTime.Now)
 		return self
 
 	def checker(url as Uri, dest as duck):
 		return def(sender as WebClient, e as DownloadDataCompletedEventArgs):
-			return unless tasks.Remove(sender)
+			lock tasks:
+				return unless tasks.Remove(sender)
 			# Error checkup.
 			try:
 				bmp = Bitmap(MemoryStream(e.Result)) unless e.Cancelled or e.Error
