@@ -108,7 +108,7 @@ class Checker():
 				out.FillRectangle(SolidBrush(Color.Black), rect)
 				out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
 				out.DrawString(login, font, SolidBrush(forecolor), start)
-			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].png")
+			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
 			# Finalization.
 			log("$shot was taken from $url", 'success')
 			dest.echo(url, 'success')
