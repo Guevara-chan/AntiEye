@@ -34,10 +34,10 @@ class CUI():
 		Console.Title = "◢.AntiEye$info.◣"
 # -------------------- #
 class DirReport():
-	dest		= ""
-	succfile 	= null
-	failfile	= null
-	channels	= {}
+	final dest		= ""
+	final succfile 	= null
+	final failfile	= null
+	final channels	= {}
 
 	def constructor(title as string):
 		Directory.CreateDirectory(dest = "$(IO.Path.GetFileName(title))~shots")
@@ -58,14 +58,14 @@ class DirReport():
 		return "$dest/$fname"
 # -------------------- #
 class Checker():
-	final log			= {info, channel|info = ':I am Error:'; return self}
-	final dbg			= {info|info = ':I am Error:'; return self}
 	final tasks			= Collections.Generic.Dictionary[of WebClient, DateTime]()
-	final max_tension	= 16
-	final timeout		= 30
 	final reductor		= Timer(Enabled: true, Interval: 1000, Tick: reduce)
 	final debugger		= Timer(Enabled: true, Interval: 200, Tick: {dbg(" [$tension/$max_tension)]")})
+	final log			= {info, channel|info = ':I am Error:'; return self}
+	final dbg			= {info|info = ':I am Error:'; return self}
 	final reporter		= void
+	final max_tension	= 16
+	final timeout		= 30
 
 	# --Methods goes here.
 	def constructor(ui as duck, storage as Type):
