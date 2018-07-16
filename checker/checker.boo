@@ -9,6 +9,7 @@ import System.Net
 import System.Drawing
 import System.Reflection
 import System.Windows.Forms
+import System.Configuration
 import System.Text.RegularExpressions
 import System.Runtime.CompilerServices
 
@@ -71,7 +72,9 @@ class Checker():
 		log			= {info, channel|ui.log(info, channel); return self}
 		dbg			= {info|ui.dbg(info); return self}
 		reporter	= storage
-		safetylast() unless Configuration.HttpWebRequestElement().UseUnsafeHeaderParsing
+		try: # F**ing Mono.
+			safetylast() unless Configuration.HttpWebRequestElement().UseUnsafeHeaderParsing
+		except: pass
 
 	def parse(entry as string):
 		entry = Regex(" ").Replace(entry, '\n', 1)
@@ -119,9 +122,9 @@ class Checker():
 		settingsSectionType  = Assembly.GetAssembly(typeof(Net.Configuration.SettingsSection))\
 		.GetType("System.Net.Configuration.SettingsSectionInternal")
 		anInstance = settingsSectionType.InvokeMember("Section", BindingFlags.Static
-		 | BindingFlags.GetProperty | BindingFlags.NonPublic, null, null, (,));
+	 	| BindingFlags.GetProperty | BindingFlags.NonPublic, null, null, (,));
 		aUseUnsafeHeaderParsing = settingsSectionType.GetField("useUnsafeHeaderParsing", BindingFlags.NonPublic
-		 | BindingFlags.Instance)
+	 	| BindingFlags.Instance)
 		aUseUnsafeHeaderParsing.SetValue(anInstance, true)
 
 	[Extension] static def echo(out as StreamWriter, text as string):
