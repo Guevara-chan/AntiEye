@@ -12,7 +12,7 @@ __Extra:__ requires ES6 support to work properly.
 __Design:__ terminal-based utility, written entirelly in [Boo v0.9.7.0](https://github.com/boo-lang/boo).  
 __Usage:__ mass-checking remote webcams through provided credentials feed by requesting broadcast snapshots.  
 __Dist:__ https://github.com/Guevara-chan/AntiEye/releases/download/v0.04/checker.zip (latest release)  
-__Extra:__ requires .NET 4.0 framework to run.
+__Extra:__ requires .NET 4.0 framework to run. Confirmed as being compatible with Mono.
 
 # :.Brief samples of interfacing.:
 ![image](https://user-images.githubusercontent.com/8768470/42713786-59e2e636-86f9-11e8-8e1b-63dcb8db68e9.png)
