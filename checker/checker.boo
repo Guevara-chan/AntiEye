@@ -1,5 +1,5 @@
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# AntiEye webcam checker v0.04
+# AntiEye webcam checker v0.05
 # Developed in 2018 by Guevara-chan.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -21,14 +21,16 @@ class CUI():
 	def constructor():
 		dbg("")
 		log("""# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-			# AntiEye webcam checker v0.04      #
+			# AntiEye webcam checker v0.05      #
 			# Developed in 2018 by V.A. Guevara #
 			# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #""".Replace('\t', ''), "meta")
 
 	# --Methods goes here.
 	def log(info, channel as string):
-		Console.ForegroundColor = Enum.Parse(ConsoleColor, channels[channel])
-		print "$info"
+		lock Console:
+			Console.ForegroundColor = Enum.Parse(ConsoleColor, channels[channel])
+			print "$info"
+			Console.ForegroundColor = ConsoleColor.Gray
 
 	def dbg(info):
 		Console.Title = "◢.AntiEye$info.◣"
@@ -89,19 +91,23 @@ class Checker():
 			# Error checkup.
 			try:
 				bmp = Bitmap(MemoryStream(e.Result)) unless e.Cancelled or e.Error
-			except: pass
+				Graphics.FromImage(bmp).Dispose() # Fu**ing Mono.
+			except: bmp = null
 			unless bmp:
 				dest.echo(url, 'fail')
 				return log("Unable to load $url", 'fail')
 			# Screenshot init.
-			using out = Graphics.FromImage(bmp):
-				login = url.UnescapeDataString(url.UserInfo)
-				rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
-				rect.Width += 2
-				out.FillRectangle(SolidBrush(Color.Black), rect)
-				out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
-				out.DrawString(login, font, SolidBrush(forecolor), start)
-			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
+			try:
+				using out = Graphics.FromImage(bmp):
+					login = url.UnescapeDataString(url.UserInfo)
+					rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
+					rect.Width += 2
+					out.FillRectangle(SolidBrush(Color.Black), rect)
+					out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
+					out.DrawString(login, font, SolidBrush(forecolor), start)
+				shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
+			except ex: print ex
+			
 			# Finalization.
 			log("$shot was taken from $url", 'success')
 			dest.echo(url, 'success')
