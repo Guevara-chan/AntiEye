@@ -105,11 +105,10 @@ class Checker():
 				out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
 				out.DrawString(login, font, SolidBrush(forecolor), start)
 			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
-			return self
-			
 			# Finalization.
 			log("$shot was taken from $url", 'success')
 			dest.echo(url, 'success')
+			return self
 
 	def reduce():
 		lock tasks:
