@@ -3,19 +3,24 @@ class UI
 
 	constructor: () ->
 		@out = document.getElementById 'output'
+		@loader = document.getElementById 'loader'
 		# Drag/drop support.
 		document.addEventListener 'dragover', (e) => e.preventDefault(); e.dataTransfer.dropEffect = 'none'
 		document.addEventListener 'drop', (e) => e.preventDefault()
 		@out.addEventListener 'dragover', (e) =>
 			e.stopPropagation(); e.preventDefault(); e.dataTransfer.dropEffect = 'copy'
 		@out.addEventListener 'drop', (e) => @importer.bind(@) e
+		# File picker support.
+		@loader.addEventListener 'change', (e) => @importer.bind(@) e
+		@out.addEventListener 'click', (e) => @loader.click() unless @loader.value
 		# Showing ui.
 		document.getElementById('ui').style.visibility = 'visible'
 
 	importer: (e) ->
 		e.stopPropagation()
 		e.preventDefault()
-		if feed = e.dataTransfer.files[0]
+		feed = e.dataTransfer ? e.target
+		if feed = feed.files[0]
 			reader = new FileReader()
 			reader.readAsText feed
 			listing					= new Set()
