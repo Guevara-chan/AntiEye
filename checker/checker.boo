@@ -87,7 +87,7 @@ class Checker():
 	def checker(url as Uri, dest as duck):
 		return def(sender as WebClient, e as DownloadDataCompletedEventArgs):
 			lock tasks:
-				return unless tasks.Remove(sender)
+				return self unless tasks.Remove(sender)
 			# Error checkup.
 			try:
 				bmp = Bitmap(MemoryStream(e.Result)) unless e.Cancelled or e.Error
@@ -97,16 +97,15 @@ class Checker():
 				dest.echo(url, 'fail')
 				return log("Unable to load $url", 'fail')
 			# Screenshot init.
-			try:
-				using out = Graphics.FromImage(bmp):
-					login = url.UnescapeDataString(url.UserInfo)
-					rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
-					rect.Width += 2
-					out.FillRectangle(SolidBrush(Color.Black), rect)
-					out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
-					out.DrawString(login, font, SolidBrush(forecolor), start)
-				shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
-			except ex: print ex
+			using out = Graphics.FromImage(bmp):
+				login = url.UnescapeDataString(url.UserInfo)
+				rect = Rectangle(start = Point(5, 5), out.MeasureString(login, font = Font('Sylfaen', 11)).ToSize())
+				rect.Width += 2
+				out.FillRectangle(SolidBrush(Color.Black), rect)
+				out.DrawRectangle(Pen(forecolor = Color.Coral, 1), rect)
+				out.DrawString(login, font, SolidBrush(forecolor), start)
+			shot = dest.store(bmp, "$(url.Host)[$(url.Port)].jpg")
+			return self
 			
 			# Finalization.
 			log("$shot was taken from $url", 'success')
