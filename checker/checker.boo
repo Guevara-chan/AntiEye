@@ -7,8 +7,8 @@ import System
 import System.IO
 import System.Net
 import System.Drawing
+import System.Threading
 import System.Reflection
-import System.Windows.Forms
 import System.Text.RegularExpressions
 import System.Runtime.CompilerServices
 import System.Configuration from System.Configuration
@@ -61,8 +61,8 @@ class DirReport():
 # -------------------- #
 class Checker():
 	final tasks			= Collections.Generic.Dictionary[of WebClient, DateTime]()
-	final reductor		= Timer(Enabled: true, Interval: 1000, Tick: reduce)
-	final debugger		= Timer(Enabled: true, Interval: 200, Tick: {dbg(" [$tension/$max_tension)]")})
+	final reductor		= Timer({reduce()}, null, 0, 1000)
+	final debugger		= Timer({dbg(" [$tension/$max_tension)]")}, null, 0, 200)
 	final log			= {info, channel|info = ':I am Error:'; return self}
 	final dbg			= {info|info = ':I am Error:'; return self}
 	final reporter		= void
@@ -143,7 +143,6 @@ class Checker():
 						if (url = feeder.Current.parse()): check(url, dest)
 						else: log("Invalid entry encountered: $(feeder.Current)", 'fault')
 					elif tension == 0: break
-					Application.DoEvents()
 			except ex: log("$ex", 'fault')
 
 	static safety:
@@ -164,4 +163,4 @@ class Checker():
 # ==Main code==
 def Main(argv as (string)):	
 	Checker(CUI(), DirReport).feed = (argv[0] if argv.Length else 'feed.txt')
-	Threading.Thread.Sleep(3000)
+	Thread.Sleep(3000)
