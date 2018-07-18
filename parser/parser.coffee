@@ -1,6 +1,4 @@
 class UI
-	buffer = new Map()
-
 	constructor: () ->
 		@out = document.getElementById 'output'
 		@loader = document.getElementById 'loader'
@@ -13,6 +11,8 @@ class UI
 		# File picker support.
 		@loader.addEventListener 'change', (e) => @importer.bind(@) e
 		@out.addEventListener 'click', (e) => @loader.click() unless @loader.value
+		# Paste support.
+		document.addEventListener 'paste', (e) => @convert.bind(@) e.clipboardData.getData 'Text'
 		# Showing ui.
 		document.getElementById('ui').style.visibility = 'visible'
 
@@ -23,23 +23,26 @@ class UI
 		if feed = feed.files[0]
 			reader = new FileReader()
 			reader.readAsText feed
-			listing					= new Set()
-			@out.style.background	= 'transparent'
-			reader.onload = (e) =>
-				for data from @parse e.target.result
-					info = "<span class='ip'>#{data.get 'ip'}</span><span class='port'>:#{data.get 'port'}</span>
-							#{data.get 'username'}<span class='delim'>:</span>#{data.get 'password'}"
-					http = "http://#{encodeURIComponent data.get 'username'}:#{encodeURIComponent data.get 'password'
-							}@#{data.get 'ip'}:#{data.get 'port'}"
-					setTimeout ((info, http) =>
-						@out.innerHTML = "<div class='info'>⟲ .:Loading entry \##{listing.size}:. ⟳</div>"
-						listing.add "<div class='liner'><a href='#{http}' target='_blank'>#{info}</a></div>"
-					).bind(@, info, http)
-				setTimeout (() =>
-					@out.innerHTML = [...listing].join ''
-					@out.style.background = '#2f2f2f').bind @
+			reader.onload = (e) -> @convert e.target.result
+
+	convert: (src) ->
+		listing					= new Set()
+		@out.style.background	= 'transparent'
+		for data from @parse src
+			info = "<span class='ip'>#{data.get 'ip'}</span><span class='port'>:#{data.get 'port'}</span>
+					#{data.get 'username'}<span class='delim'>:</span>#{data.get 'password'}"
+			http = "http://#{encodeURIComponent data.get 'username'}:#{encodeURIComponent data.get 'password'
+					}@#{data.get 'ip'}:#{data.get 'port'}"
+			setTimeout ((info, http) =>
+				@out.innerHTML = "<div class='info'>⟲ .:Loading entry \##{listing.size}:. ⟳</div>"
+				listing.add "<div class='liner'><a href='#{http}' target='_blank'>#{info}</a></div>"
+			).bind(@, info, http)
+		setTimeout (() =>
+			@out.innerHTML = [...listing].join ''
+			@out.style.background = '#2f2f2f').bind @
 
 	parse: (text) ->
+		buffer = new Map()
 		for line in text.split /\r?\n/ when cut = line.match(/^(\[92m)?\[\+]The /)?[0]
 			buffer = new Map [...buffer].concat line[cut.length..].split(",").map (t) -> t.split ':'
 			if buffer.has('username') and buffer.has 'password'
