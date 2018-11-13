@@ -27,13 +27,17 @@ class CUI():
 
 	# --Methods goes here.
 	def log(info, channel as string):
-		lock Console:
+		lock self:
 			Console.ForegroundColor = Enum.Parse(ConsoleColor, channels[channel])
 			print "$info"
 			Console.ForegroundColor = ConsoleColor.Gray
 
 	def dbg(info):
 		Console.Title = "◢.AntiEye$info.◣"
+
+	def destructor():
+		Console.ForegroundColor = ConsoleColor.Gray
+		Threading.Thread.Sleep(3000)
 # -------------------- #
 class DirReport():
 	final dest		= ""
@@ -47,9 +51,10 @@ class DirReport():
 		channels = {"success": succfile, "fail": failfile}
 
 	def echo(info, channel as string):
-		out = channels[channel] as StreamWriter
-		out.WriteLine(text = "$info")
-		out.Flush()
+		lock self:
+			out = channels[channel] as StreamWriter
+			out.WriteLine(text = "$info")
+			out.Flush()
 		return text
 
 	def store(bmp as Bitmap, name as string):
@@ -161,4 +166,3 @@ class Checker():
 # ==Main code==
 def Main(argv as (string)):	
 	Checker(CUI(), DirReport).feed = (argv[0] if argv.Length else 'feed.txt')
-	Thread.Sleep(3000)
