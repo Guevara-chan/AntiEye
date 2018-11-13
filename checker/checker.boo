@@ -27,7 +27,7 @@ class CUI():
 
 	# --Methods goes here.
 	def log(info, channel as string):
-		lock self:
+		lock Console:
 			Console.ForegroundColor = Enum.Parse(ConsoleColor, channels[channel])
 			print "$info"
 			Console.ForegroundColor = ConsoleColor.Gray
