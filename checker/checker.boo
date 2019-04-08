@@ -67,7 +67,7 @@ class DirReport():
 class Checker():
 	final tasks			= Collections.Generic.Dictionary[of WebClient, DateTime]()
 	final reductor		= Timer({reduce()}, null, 0, 1000)
-	final debugger		= Timer({dbg(" [$tension/$max_tension)]")}, null, 0, 200)
+	final debugger		= Timer({dbg(" [$tension/$max_tension]")}, null, 0, 200)
 	final log			= {info, channel|info = ':I am Error:'; return self}
 	final dbg			= {info|info = ':I am Error:'; return self}
 	final reporter		= void
